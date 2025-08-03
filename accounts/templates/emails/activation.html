@@ -1,0 +1,10 @@
+<!-- accounts/templates/emails/activation.html -->
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Hello {{ user.first_name }},</p>
+  <p>Please activate your account by clicking this link:</p>
+  <p><a href="{{ activation_url }}">Activate Account</a></p>
+  <p>Or copy this URL to your browser: {{ activation_url }}</p>
+</body>
+</html>
