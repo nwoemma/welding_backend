@@ -6,11 +6,9 @@ import dj_database_url
 DEBUG =  True
 SECRET_KEY = 'django-insecure-5s^^j6r5n^x2pu+e!nn+&2jxr^=!4*=*$1p@o5=ikpk#kh6_+u'
 ALLOWED_HOSTS = [
-    "abiaconnect.onrender.com",
-    "www.abiaconnect.onrender.com",
-    "abiaconnect.render.com",
-    "localhost",
-    "127.0.0.1",
+    "https://welding-backend-vm1n.onrender.com",
+    "welding-backend-vm1n.onrender.com",
+    "welding-backend.onrender.com",
 ]
 
 # Database

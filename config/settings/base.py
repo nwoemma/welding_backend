@@ -58,6 +58,7 @@ MIDDLEWARE = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Your React app's origin
+    "https://welding-frontend.vercel.app",  # Your deployed React app's origin
 ]
 ROOT_URLCONF = 'project_works.urls'
 
