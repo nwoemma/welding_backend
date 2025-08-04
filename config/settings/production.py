@@ -13,20 +13,20 @@ ALLOWED_HOSTS = [
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'abia2025',
-#         'USER': 'abia_user',
-#         'PASSWORD': 'BYABPZ9xPxY7U3rsamblVnOtnyKSEao9',
-#         'HOST': 'dpg-d0otn1ruibrs7384a9og-a.frankfurt-postgres.render.com',
-#         'PORT': '5432',
-#         # Add this line if your host requires SSL
-#         'OPTIONS': {
-#             'sslmode': 'require',
-#         },
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'welderapp2025',
+        'USER': 'welderuser',
+        'PASSWORD': 'chznydwDty71uvVFZB4TZqoPCIsjKpQT',
+        'HOST': 'dpg-d28gegmr433s73e0cpqg-a',
+        'PORT': '5432',
+        # Add this line if your host requires SSL
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
+}
 
 # else:
 #     # Local development default database (SQLite)
