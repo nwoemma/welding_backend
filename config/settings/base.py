@@ -60,6 +60,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Your React app's origin
     "https://welding-frontend.vercel.app",  # Your deployed React app's origin
     "https://welding-frontend-hbynvye02-emmanuel-nwosus-projects-5306a087.vercel.app",
+    "https://welding-backend-vm1n.onrender.com",
 ]
 ROOT_URLCONF = 'project_works.urls'
 
