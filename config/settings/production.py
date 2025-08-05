@@ -6,7 +6,6 @@ import dj_database_url
 DEBUG =  True
 SECRET_KEY = 'django-insecure-5s^^j6r5n^x2pu+e!nn+&2jxr^=!4*=*$1p@o5=ikpk#kh6_+u'
 ALLOWED_HOSTS = [
-    "https://welding-backend-vm1n.onrender.com",
     "welding-backend-vm1n.onrender.com",
     "welding-backend.onrender.com",
 ]
@@ -22,9 +21,9 @@ DATABASES = {
         'HOST': 'dpg-d28gegmr433s73e0cpqg-a',
         'PORT': '5432',
         # Add this line if your host requires SSL
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        # 'OPTIONS': {
+        #     'sslmode': 'require',
+        # },
     }
 }
 
