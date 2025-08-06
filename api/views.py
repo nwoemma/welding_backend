@@ -24,7 +24,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.template.loader import render_to_string
 from django.conf import settings
 import logging
-from accounts.models import UserManager
+from django.db.utils import OperationalError, ProgrammingError
 logger = logging.getLogger(__name__)
 
 @api_view(['POST'])
@@ -85,7 +85,18 @@ def create_admin(request):
 def register(request):
     print("\n=== DEBUG: REGISTRATION STARTED ===")
     print(f"Raw request data: {request.data}")
-    
+    try:
+        # Check if the table exists
+        from django.apps import apps
+        if not apps.is_installed('accounts'):
+            return Response({"error": "Accounts app not installed."}, status=500)
+
+        # This avoids trying to query before migrations are applied
+        if not User.objects.exists():
+            return Response({"error": "User table does not yet exist."}, status=500)
+
+    except (OperationalError, ProgrammingError):
+        return Response({"error": "Database is not ready yet."}, status=500)
     try:
         # Data Extraction and Validation
         full_name = request.data.get('full_name')
