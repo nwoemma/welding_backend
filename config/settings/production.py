@@ -15,10 +15,10 @@ ALLOWED_HOSTS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'welderapp2025',
-        'USER': 'welderuser',
+        'NAME': 'welder_app_backend_db',
+        'USER': 'welder_user',
         'PASSWORD': 'chznydwDty71uvVFZB4TZqoPCIsjKpQT',
-        'HOST': 'dpg-d28gegmr433s73e0cpqg-a',
+        'HOST': 'dpg-d29a6hadbo4c73b9la9g-a',
         'PORT': '5432',
         # Add this line if your host requires SSL
         # 'OPTIONS': {
