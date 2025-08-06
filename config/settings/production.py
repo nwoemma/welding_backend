@@ -21,6 +21,7 @@ DATABASES = {
         'PASSWORD': 'k2SOh9XBuZnPU0jx6EA3xE5EV3qiwr7U',
         'HOST': 'dpg-d29a6hadbo4c73b9la9g-a',
         'PORT': '5432',
+        'CONN_MAX_AGE': 600,
         # Add this line if your host requires SSL
         # 'OPTIONS': {
         #     'sslmode': 'require',
