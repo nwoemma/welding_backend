@@ -13,23 +13,28 @@ ALLOWED_HOSTS = [
 ]
 
 # Database Configuration
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://welder_user:H8q6ped5s40EJLXLMgAanVnv2YOo1gRC@dpg-d29mkc6uk2gs73f6ofeg-a.frankfurt-postgres.render.com/welder_app_backend_db_4r6e')
+# DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://welder_user:H8q6ped5s40EJLXLMgAanVnv2YOo1gRC@dpg-d29mkc6uk2gs73f6ofeg-a.frankfurt-postgres.render.com/welder_app_backend_db_4r6e')
 
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=DATABASE_URL,
+#         conn_max_age=600,
+#         ssl_require=True  # Important for Render.com
+#     )
+# }
+
+# # Fallback to SQLite if no database configured (for local development only)
+# if 'test' in sys.argv or not DATABASES['default']:
+#     DATABASES['default'] = {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
 DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=True  # Important for Render.com
-    )
-}
-
-# Fallback to SQLite if no database configured (for local development only)
-if 'test' in sys.argv or not DATABASES['default']:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
