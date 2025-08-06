@@ -5,7 +5,7 @@ import sys
 
 # Security settings
 DEBUG = True  # Change to False in production!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
+# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
 ALLOWED_HOSTS = [
     "welding-backend-vm1n.onrender.com",
     "welding-backend.onrender.com",
