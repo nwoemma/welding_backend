@@ -12,23 +12,9 @@ ALLOWED_HOSTS = [
 ]
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'welder_app_backend_db_4r6e',
-        'USER': 'welder_user',
-        'PASSWORD': 'H8q6ped5s40EJLXLMgAanVnv2YOo1gRC',
-        'HOST': 'dpg-d29mkc6uk2gs73f6ofeg-a',
-        'PORT': '5432',
-        'CONN_MAX_AGE': 600,
-        # Add this line if your host requires SSL
-        # 'OPTIONS': {
-        #     'sslmode': 'require',
-        # },
-    }
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
-
 
 
 # else:
