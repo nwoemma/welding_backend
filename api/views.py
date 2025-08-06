@@ -97,7 +97,7 @@ def register(request):
 
     except (OperationalError, ProgrammingError) as e:
         print(e)
-        return Response({"error": "Database is not ready yet."}, status=500)
+        return Response({"error": "Database is not ready yet.", "error_detail:":e}, status=500)
     try:
         # Data Extraction and Validation
         full_name = request.data.get('full_name')
