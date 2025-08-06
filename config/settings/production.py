@@ -1,6 +1,7 @@
 from .base import *
 import os
 import dj_database_url
+import sys
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =  True
@@ -27,6 +28,33 @@ DATABASES = {
     }
 }
 
+
+if 'migrate' in sys.argv or 'runserver' in sys.argv:
+    # Temporary direct table creation
+    from django.db import connection
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS accounts_user (
+                id serial PRIMARY KEY,
+                password varchar(128) NOT NULL,
+                last_login timestamp with time zone NULL,
+                is_superuser boolean NOT NULL,
+                username varchar(150) NOT NULL UNIQUE,
+                first_name varchar(150) NOT NULL,
+                last_name varchar(150) NOT NULL,
+                email varchar(254) NOT NULL UNIQUE,
+                is_staff boolean NOT NULL,
+                is_active boolean NOT NULL,
+                date_joined timestamp with time zone NOT NULL,
+                phone varchar(15) NULL,
+                address text NULL,
+                role varchar(20) NULL,
+                status varchar(1) NULL
+            );
+        """)
+        print("⚠️ TEMPORARY: Created accounts_user table directly")
+
 # else:
 #     # Local development default database (SQLite)
 #     DATABASES = {
@@ -50,7 +78,7 @@ DATABASES = {
 
 STATIC_ROOT = BASE_DIR/ 'static'
 
-
+AUTH_USER_MODEL = 'accounts.User'
 
 
 LOGGING = {
