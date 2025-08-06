@@ -64,6 +64,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://welding-frontend.vercel.app",
     "https://welding-frontend-hbynvye02-emmanuel-nwosus-projects-5306a087.vercel.app",
+    "https://welding-frontend-git-main-emmanuel-nwosus-projects-5306a087.vercel.app"
 ]
 
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
