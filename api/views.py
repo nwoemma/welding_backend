@@ -95,7 +95,8 @@ def register(request):
         if not User.objects.exists():
             return Response({"error": "User table does not yet exist."}, status=500)
 
-    except (OperationalError, ProgrammingError):
+    except (OperationalError, ProgrammingError) as e:
+        print(e)
         return Response({"error": "Database is not ready yet."}, status=500)
     try:
         # Data Extraction and Validation
