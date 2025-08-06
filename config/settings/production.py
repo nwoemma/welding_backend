@@ -17,7 +17,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'welder_app_backend_db',
         'USER': 'welder_user',
-        'PASSWORD': 'chznydwDty71uvVFZB4TZqoPCIsjKpQT',
+        'PASSWORD': 'k2SOh9XBuZnPU0jx6EA3xE5EV3qiwr7U',
         'HOST': 'dpg-d29a6hadbo4c73b9la9g-a',
         'PORT': '5432',
         # Add this line if your host requires SSL
