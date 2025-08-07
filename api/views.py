@@ -402,7 +402,7 @@ def create_job(request):
     
     
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def apply_for_job(request, user_id, job_id):
     firstname = request.data.get('first_name')
     lastname = request.data.get('last_name')
