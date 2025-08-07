@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager,Permission, Group
 import uuid
 from django.utils import timezone
-
+import json
 
 # Create your models here.
 
@@ -74,6 +74,40 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['phone']
     
     location = models.CharField(max_length=100, blank=True, null=True)
+    
+    
+    education = models.CharField(max_length=100, blank=True, null=True)
+    skills = models.CharField(max_length=255, blank=True, null=True)
+    job = models.CharField(max_length=100, blank=True, null=True)
+    company = models.CharField(max_length=100, blank=True, null=True)
+    about = models.TextField(blank=True, null=True)
+    country = models.CharField(max_length=100, default='United States')
+    
+    # For JSON fields
+    _social = models.TextField(blank=True, default='{}')
+    _notifications = models.TextField(blank=True, default='{}')
+    
+    @property
+    def social(self):
+        try:
+            return json.loads(self._social)
+        except json.JSONDecodeError:
+            return {}
+    
+    @social.setter
+    def social(self, value):
+        self._social = json.dumps(value if value else {})
+    
+    @property
+    def notifications(self):
+        try:
+            return json.loads(self._notifications)
+        except json.JSONDecodeError:
+            return {}
+    
+    @notifications.setter
+    def notifications(self, value):
+        self._notifications = json.dumps(value if value else {})
     class Meta:
         db_table = 'accounts_user'
         

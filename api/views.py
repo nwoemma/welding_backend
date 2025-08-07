@@ -14,6 +14,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from rest_framework.decorators import permission_classes,authentication_classes
 import random
 from django.db import models
+from django.core.files.base import ContentFile
+import base64
 from django.utils import timezone
 from job_tasks.models import Job, Material,Task, Notification, Application
 from accounts.models import User
@@ -248,24 +250,38 @@ def dashboard(request):
 
     serializer = DashboardSerializer(dashboard, context= {'request':request})
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 @api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def profile_view(request):
     user = request.user
+    
     if request.method == 'GET':
-        serializer = ProfileSerializer(user)
-        # print("Profile update errors:", serializer.errors)
+        serializer = ProfileSerializer(user, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
     elif request.method == 'PUT':
-        serializer = ProfileSerializer(user, data=request.data, partial=True)
+        data = request.data.copy()
+        
+        # Handle base64 image if sent
+        if 'profile_pic' in data and isinstance(data['profile_pic'], str) and data['profile_pic'].startswith('data:image'):
+            format, imgstr = data['profile_pic'].split(';base64,')
+            ext = format.split('/')[-1]
+            file_name = f"profile_{user.id}.{ext}"
+            user.profile_pic.save(file_name, ContentFile(base64.b64decode(imgstr)))
+            data.pop('profile_pic')  # Remove from data since we've handled it
+        
+        serializer = ProfileSerializer(user, data=data, partial=True, context={'request': request})
+        
         if serializer.is_valid():
-            if 'profile_pic' in request.FILES:
-                profile_pic = request.FILES['profile_pic']
-                serializer.validated_data['profile_pic'] = profile_pic
-            user = serializer.save()
-            # print("Profile update errors:", serializer.errors)
-            return Response(ProfileSerializer(user).data, status=status.HTTP_200_OK)
+            # Handle nested data
+            if 'social' in data:
+                user.social = data['social']
+            if 'notifications' in data:
+                user.notifications = data['notifications']
+            
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
