@@ -94,8 +94,10 @@ def register(request):
             return Response({"error": "Accounts app not installed."}, status=500)
 
         # This avoids trying to query before migrations are applied
-        if not User.objects.exists():
-            return Response({"error": "User table does not yet exist."}, status=500)
+        try:
+            User.objects.first()
+        except Exception as e:
+            return Response({"error": "User table inaccessible", "details": str(e)}, status=500)
 
     except (OperationalError, ProgrammingError) as e:
         print(e)
