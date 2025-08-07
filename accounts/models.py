@@ -38,7 +38,7 @@ class User(AbstractUser):
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     ROLE = (
         ('client', "Client"),
-        ('vendor', "Vendor"),
+        ('welder', "Welder"),
         ('admin', "Admin"),
     )
     
