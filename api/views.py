@@ -402,41 +402,69 @@ def create_job(request):
     
     
 @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def apply_for_job(request, user_id, job_id):
-    firstname = request.data.get('first_name')
-    lastname = request.data.get('last_name')
-    email = request.data.get('email')
-    phone = request.data.get('phone')
-    resume = request.FILES.get('resume')
-    cover_letter = request.data.get('cover_letter')
-    experience = request.data.get('experience')
-    education = request.data.get('education')
-    skills = request.data.get('skills')
-    source = request.data.get('source', 'website')
+    # Verify the requesting user matches the user_id
+    if str(request.user.id) != user_id:
+        return Response({"error": "Unauthorized application attempt"}, status=status.HTTP_403_FORBIDDEN)
 
-    if not all([firstname, lastname, email, phone, resume, cover_letter, experience, education, skills, source]):
-        return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
-    if not request.user.is_authenticated:
-        return Response({"error": "You must be logged in to apply for a job."}, status=status.HTTP_401_UNAUTHORIZED)
+    # Get required data
+    data = {
+        'first_name': request.data.get('first_name'),
+        'last_name': request.data.get('last_name'),
+        'email': request.data.get('email'),
+        'phone': request.data.get('phone'),
+        'resume': request.FILES.get('resume'),
+        'cover_letter': request.data.get('cover_letter'),
+        'experience': request.data.get('experience'),
+        'education': request.data.get('education'),
+        'skills': request.data.get('skills'),
+        'source': request.data.get('source', 'website')
+    }
 
-    user = get_object_or_404(User, id=user_id)
-    if user.role != 'welder':
-        return Response({"error": "Only welders can apply for jobs."}, status=status.HTTP_403_FORBIDDEN)
-    
-    
-    job = get_object_or_404(Job, id=job_id)
+    # Validate required fields
+    missing_fields = [field for field, value in data.items() if not value and field != 'source']
+    if missing_fields:
+        return Response({"error": f"Missing required fields: {', '.join(missing_fields)}"}, 
+                      status=status.HTTP_400_BAD_REQUEST)
 
-    if job.status not in Job.STATUS_CHOICES:
-        return Response({"error": "Job is not open for applications."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Check if the welder has already applied
-    if job.welder == user:
-        return Response({"error": "You have already applied for this job."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Assign the welder to the job
-    job.welder = user
-    job.status = 'in_progress'
-    job.save()
-    
-    return Response({"message": "You have successfully applied for the job."}, status=status.HTTP_200_OK)
+    try:
+        user = User.objects.get(id=user_id)
+        job = Job.objects.get(id=job_id)
+        
+        if user.role != 'welder':
+            return Response({"error": "Only welders can apply for jobs"}, status=status.HTTP_403_FORBIDDEN)
+            
+        if job.status != 'open':
+            return Response({"error": "Job is not open for applications"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if job.welder:
+            return Response({"error": "Job already assigned"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # Create application record
+        application = JobApplication.objects.create(
+            job=job,
+            welder=user,
+            **{k: v for k, v in data.items() if k != 'resume'}
+        )
+        
+        if data['resume']:
+            application.resume = data['resume']
+            application.save()
+            
+        # Update job status
+        job.status = 'in_progress'
+        job.welder = user
+        job.save()
+        
+        return Response({
+            "message": "Application submitted successfully",
+            "application_id": application.id
+        }, status=status.HTTP_201_CREATED)
+        
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Job.DoesNotExist:
+        return Response({"error": "Job not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
