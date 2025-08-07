@@ -75,6 +75,26 @@ CSRF_TRUSTED_ORIGINS = [
     "https://welding-frontend.vercel.app",
     "https://welding-backend-vm1n.onrender.com",
 ]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 
 # Cookie settings
 SESSION_COOKIE_SECURE = not DEBUG  # True in production
