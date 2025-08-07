@@ -237,25 +237,37 @@ def dashboard(request):
     serializer = DashboardSerializer(dashboard, context= {'request':request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 @api_view(['GET', 'PUT'])
+@authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def profile_view(request):
-    user = request.user
-    if request.method == 'GET':
-        serializer = ProfileSerializer(user)
-        # print("Profile update errors:", serializer.errors)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    elif request.method == 'PUT':
-        serializer = ProfileSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            if 'profile_pic' in request.FILES:
-                profile_pic = request.FILES['profile_pic']
-                serializer.validated_data['profile_pic'] = profile_pic
-            user = serializer.save()
-            # print("Profile update errors:", serializer.errors)
-            return Response(ProfileSerializer(user).data, status=status.HTTP_200_OK)
+    try:
+        user = request.user
+        logger.info(f"Profile request from user: {user.email}")
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.method == 'GET':
+            serializer = ProfileSerializer(user)
+            return Response(serializer.data)
+            
+        elif request.method == 'PUT':
+            data = request.data.copy()
+            logger.debug(f"Received profile update data: {data}")
+            
+            if 'profile_pic' in request.FILES:
+                data['profile_pic'] = request.FILES['profile_pic']
+                logger.info("Profile picture file received")
+            
+            serializer = ProfileSerializer(user, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                logger.info("Profile updated successfully")
+                return Response(serializer.data)
+            
+            logger.error(f"Profile update validation errors: {serializer.errors}")
+            return Response(serializer.errors, status=400)
+            
+    except Exception as e:
+        logger.error(f"Profile view error: {str(e)}", exc_info=True)
+        return Response({"error": "Internal server error"}, status=500)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
