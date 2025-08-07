@@ -35,6 +35,21 @@ DATABASES = {
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'welder_app_backend_db_4r6e',
+#         'USER': 'welder_user',
+#         'PASSWORD': 'H8q6ped5s40EJLXLMgAanVnv2YOo1gRC',
+#         'HOST': 'dpg-d29mkc6uk2gs73f6ofeg-a',
+#         'PORT': '5432',
+#         'CONN_MAX_AGE': 600,
+#         # Add this line if your host requires SSL
+#         # 'OPTIONS': {
+#         #     'sslmode': 'require',
+#         # },
+#     }
+# }
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
