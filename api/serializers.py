@@ -16,9 +16,34 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data['password'])
         return User.objects.create(**validated_data)
 class ProfileSerializer(serializers.ModelSerializer):
+    profile_pic_url = serializers.SerializerMethodField()
+    social = serializers.JSONField(required=False)
+    notifications = serializers.JSONField(required=False)
+    
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email', 'phone', 'address', 'role', 'profile_pic']
+        fields = [
+            'id', 'first_name', 'last_name', 'email', 'phone', 
+            'address', 'role', 'profile_pic', 'profile_pic_url',
+            'education', 'skills', 'job', 'company', 'about',
+            'country', 'social', 'notifications'
+        ]
+        extra_kwargs = {
+            'profile_pic': {'write_only': True},
+            'email': {'read_only': True}
+        }
+    
+    def get_profile_pic_url(self, obj):
+        if obj.profile_pic:
+            return self.context['request'].build_absolute_uri(obj.profile_pic.url)
+        return None
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Ensure social and notifications are always objects
+        data['social'] = instance.social if hasattr(instance, 'social') else {}
+        data['notifications'] = instance.notifications if hasattr(instance, 'notifications') else {}
+        return data
 
 class JobSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.get_full_name', read_only=True)
