@@ -9,8 +9,8 @@ packaging==25.0
 pillow==11.3.0
 psycopg2-binary==2.9.10
 PyJWT==2.10.1
-python-magic==0.4.27
-python-magic-bin==0.4.14
+python-magic
+python-magic-bic
 sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.9.0
