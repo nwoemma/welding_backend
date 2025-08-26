@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'api',
     'job_tasks',
+
 ]
 
 MIDDLEWARE = [

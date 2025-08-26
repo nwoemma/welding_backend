@@ -14,5 +14,5 @@ urlpatterns = [
     path('jobs/search/', views.job_search, name='job_search'),
     path('jobs/paginated/', views.job_list_paginated, name='job_list_paginated'),
     path('users/', views.user_list, name='user-list'),
-    # path('apply_for_job/<int:job_id>/', views.apply_for_job, name='apply_for_job'),
+    path('apply_for_job/<int:job_id>/', views.apply_for_job, name='apply_for_job'),
 ]

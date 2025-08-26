@@ -21,3 +21,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/rest/v2/', include('api.urls'))
 ]
+

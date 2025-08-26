@@ -1,10 +1,10 @@
 from .base import *
 import os
-import dj_database_url
+# import dj_database_url
 import sys
 
 # Security settings
-DEBUG = True  # Change to False in production!
+DEBUG = False  # Change to False in production!
 # SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key-for-dev-only')
 ALLOWED_HOSTS = [
     "welding-backend-vm1n.onrender.com",
