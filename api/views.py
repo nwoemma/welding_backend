@@ -16,6 +16,8 @@ import random
 from django.db import models
 from django.utils import timezone
 from job_tasks.models import Job, Material,Task, Notification, Application
+from django.core.exceptions import ValidationError
+import magic
 from accounts.models import User
 from datetime import timedelta
 from django.core.mail import send_mail
@@ -383,42 +385,92 @@ def create_job(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def apply_for_job(request, user_id, job_id):
-#     firstname = request.data.get('first_name')
-#     lastname = request.data.get('last_name')
-#     email = request.data.get('email')
-#     phone = request.data.get('phone')
-#     resume = request.FILES.get('resume')
-#     cover_letter = request.data.get('cover_letter')
-#     experience = request.data.get('experience')
-#     education = request.data.get('education')
-#     skills = request.data.get('skills')
-#     source = request.data.get('source', 'website')
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def apply_for_job(request, job_id):
+    # Validate user is a welder
+    if request.user.role != 'welder':
+        return Response(
+            {"error": "Only welders can apply for jobs"}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
 
-#     if not all([firstname, lastname, email, phone, resume, cover_letter, experience, education, skills, source]):
-#         return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
-#     if not request.user.is_authenticated:
-#         return Response({"error": "You must be logged in to apply for a job."}, status=status.HTTP_401_UNAUTHORIZED)
+    # Get job instance
+    job = get_object_or_404(Job, id=job_id)
 
-#     user = get_object_or_404(User, id=user_id)
-#     if user.role != 'welder':
-#         return Response({"error": "Only welders can apply for jobs."}, status=status.HTTP_403_FORBIDDEN)
-    
-    
-#     job = get_object_or_404(Job, id=job_id)
+    # Check for existing application
+    if Application.objects.filter(user=request.user, job=job).exists():
+        return Response(
+            {"error": "You have already applied to this job"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
-#     if job.status not in Job.STATUS_CHOICES:
-#         return Response({"error": "Job is not open for applications."}, status=status.HTTP_400_BAD_REQUEST)
-    
-#     # Check if the welder has already applied
-#     if job.welder == user:
-#         return Response({"error": "You have already applied for this job."}, status=status.HTTP_400_BAD_REQUEST)
-    
-#     # Assign the welder to the job
-#     job.welder = user
-#     job.status = 'in_progress'
-#     job.save()
-    
-#     return Response({"message": "You have successfully applied for the job."}, status=status.HTTP_200_OK)
+    # Validate required fields
+    required_fields = {
+        'first_name': request.data.get('first_name'),
+        'last_name': request.data.get('last_name'),
+        'email': request.data.get('email'),
+        'phone': request.data.get('phone'),
+        'resume': request.FILES.get('resume'),
+        'experience': request.data.get('experience'),
+        'education': request.data.get('education'),
+        'skills': request.data.get('skills')
+    }
+
+    missing_fields = [field for field, value in required_fields.items() if not value]
+    if missing_fields:
+        return Response(
+            {"error": f"Missing required fields: {', '.join(missing_fields)}"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Validate file type and size
+    resume = required_fields['resume']
+    try:
+        file_type = magic.from_buffer(resume.read(1024), mime=True)
+        resume.seek(0)  # Reset file pointer
+        
+        if file_type not in ['application/pdf', 'application/msword', 
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document']:
+            raise ValidationError("Only PDF or Word documents are allowed")
+        
+        if resume.size > 5 * 1024 * 1024:  # 5MB limit
+            raise ValidationError("File size exceeds 5MB limit")
+            
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Create application
+    try:
+        application = Application.objects.create(
+            job=job,
+            user=request.user,
+            first_name=required_fields['first_name'],
+            last_name=required_fields['last_name'],
+            email=required_fields['email'],
+            phone=required_fields['phone'],
+            resume=resume,
+            cover_letter=request.data.get('cover_letter', ''),
+            experience=required_fields['experience'],
+            education=required_fields['education'],
+            skills=required_fields['skills'],
+            source=request.data.get('source', 'website')
+        )
+        
+        return Response(
+            {
+                "success": "Application submitted successfully",
+                "application_id": application.id,
+                "status": application.status
+            },
+            status=status.HTTP_201_CREATED
+        )
+        
+    except Exception as e:
+        return Response(
+            {"error": "Failed to process application"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

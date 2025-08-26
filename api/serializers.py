@@ -219,10 +219,22 @@ class DashboardSerializer(serializers.Serializer):
         return "Just now"
     
 class ApplicationSerializer(serializers.ModelSerializer):
+    resume_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Application
-        fields = '__all__'
-        read_only_fields = ['submitted_at']
+        fields = [
+            'id', 'job', 'status', 'first_name', 'last_name',
+            'email', 'phone', 'resume_url', 'cover_letter',
+            'experience', 'education', 'skills', 'source',
+            'submitted_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'status', 'submitted_at', 'updated_at']
+        
+    def get_resume_url(self, obj):
+        if obj.resume:
+            return self.context['request'].build_absolute_uri(obj.resume.url)
+        return None
         
 class JobSerializer(serializers.ModelSerializer):
     client = UserSerializer(read_only=True)

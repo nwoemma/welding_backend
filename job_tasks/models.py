@@ -49,16 +49,31 @@ class Notification(models.Model):
     message = models.CharField(max_length=255)
     read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
 class Application(models.Model):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ('submitted', 'Submitted'),
+        ('under_review', 'Under Review'),
+        ('interview', 'Interview Scheduled'),
+        ('rejected', 'Rejected'),
+        ('hired', 'Hired'),
+    ]
+    
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
-    phone = models.CharField(max_length=20, blank=True)
-    resume = models.FileField(upload_to='resumes/')
+    phone = models.CharField(max_length=20)
+    resume = models.FileField(upload_to='resumes/%Y/%m/%d/')
     cover_letter = models.TextField(blank=True)
     experience = models.TextField()
     education = models.TextField()
     skills = models.TextField()
-    source = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
+    source = models.CharField(max_length=50, default='website')
     submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['job', 'user'] 
