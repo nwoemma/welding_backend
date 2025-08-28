@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import User 
-from job_tasks.models import Job,Task, Material, Notification, Application
+from job_tasks.models import Job,Task, Material, Notification, Application, ReportIssue,LogWork
 from django.utils.timesince import timesince
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -267,3 +267,17 @@ class JobSerializer(serializers.ModelSerializer):
         if self.instance is None and Job.objects.filter(job_id=value).exists():
             raise serializers.ValidationError("A job with this ID already exists.")
         return value
+
+class ReportIssueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReportIssue
+        fields = ['id', 'title', 'description', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'status', 'created_at', 'updated_at']
+        
+class LogWorkSerializer(serializers.ModelSerializer):
+    job_title = serializers.CharField(source='job.title', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    class Meta:
+        model = LogWork
+        fields = ['id', 'user', 'job', 'hours_worked', 'date', 'created_at', 'updated_at', 'job_title', 'username']
+        read_only_fields = ['id', 'created_at', 'updated_at']

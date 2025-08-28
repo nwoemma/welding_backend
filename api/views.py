@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from rest_framework.decorators import api_view
 from django.urls import reverse
 from rest_framework.response import Response
-from .serializers import UserSerializer,ProfileSerializer,JobSerializer,MaterialSerializer,NotificationSerializer,TaskSerializer,DashboardSerializer
+from .serializers import UserSerializer,ProfileSerializer,JobSerializer,MaterialSerializer,NotificationSerializer,TaskSerializer,DashboardSerializer, ReportIssueSerializer, LogWorkSerializer
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.hashers import make_password
 from accounts.utlity import set_username
@@ -15,7 +15,7 @@ from rest_framework.decorators import permission_classes,authentication_classes
 import random
 from django.db import models
 from django.utils import timezone
-from job_tasks.models import Job, Material,Task, Notification, Application
+from job_tasks.models import Job, LogWork, Material,Task, Notification, Application
 from django.core.exceptions import ValidationError
 import magic
 from accounts.models import User
@@ -474,3 +474,92 @@ def apply_for_job(request, job_id):
             {"error": "Failed to process application"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+@api_view(['POST'])
+def reject_application(request, application_id):
+    application = get_object_or_404(Application, id=application_id, user=request.user)
+
+    if application.status != 'submitted':
+        return Response(
+            {"error": "Only submitted applications can be withdrawn"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+        
+    if request.user.role == "welder":
+        return Response(
+            {"error": "Welder cannot withdraw application"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    application.status = 'rejected'
+    application.save()
+
+    return Response(
+        {"success": "Application rejected successfully"},
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['POST'])
+def issue_report(request):
+    reported_by = request.user
+    title = request.data.get('title')
+    description = request.data.get('description')
+
+    # Validate required fields
+    if not title or not description:
+        return Response(
+            {"error": "Missing required fields"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    data = {
+        "title": title,
+        "description": description,
+        "reported_by": reported_by
+    }
+
+    serializer = ReportIssueSerializer(data=data)
+    if serializer.is_valid():
+        issue = serializer.save()
+        return Response(
+            {"success": "Issue reported successfully", "issue_id": issue.id},
+            status=status.HTTP_201_CREATED
+        )
+    return Response(
+        {"error": "Failed to report issue"},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
+@api_view(['GET'])
+def see_log_work(request):
+    user = request.user
+    log_entries = LogWork.objects.filter(user=user)
+    serializer = LogWorkSerializer(log_entries, many=True)
+    return Response(serializer.data)
+
+@api_view(["GET", "POST"])
+def see_job_materials(request):
+    job_id = request.query_params.get("job_id")
+    if not job_id:
+        return Response(
+            {"error": "Job ID is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    materials = Material.objects.filter(job__id=job_id)
+    serializer = MaterialSerializer(materials, many=True)
+    return Response(serializer.data)
+    
+def add_job_materials(request):
+    data = {
+        "name":request.data.get('name'),
+        'quantity': request.data.get('quantity'),
+        'cost': request.data.get('cost')    
+    }
+    serializer = MaterialSerializer(data=data)
+    if serializer.is_valid():
+        material = serializer.save()
+        return Response(
+            {"success": "Material added successfully", "material_id": material.id},
+            status=status.HTTP_201_CREATED
+        )
+    return Response(
+        {"error": "Failed to add material"},
+        status=status.HTTP_400_BAD_REQUEST
+    )
