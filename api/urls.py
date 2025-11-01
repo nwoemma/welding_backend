@@ -4,6 +4,7 @@ from api import views
 urlpatterns = [
     path('sign_up/', views.register, name='register'),
     path("sign_in/", views.login_user, name="signin"),
+    path("sign_out/", views.logout_user, name="signout"),
     # path('get_dashboard_data/', views.get_dashboard_data, name="get_dashboard_data")
     path('dashboard/', views.dashboard, name="dashboard"),
     path('profile/', views.profile_view, name="profile"),

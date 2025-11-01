@@ -85,7 +85,14 @@ class DashboardSerializer(serializers.Serializer):
     activity_chart = serializers.SerializerMethodField()
     project_timeline = serializers.SerializerMethodField()
     productivity_chart = serializers.SerializerMethodField()
-
+    total_users = serializers.IntegerField()
+    total_jobs = serializers.IntegerField()
+    total_materials = serializers.IntegerField()
+    total_notifications = serializers.IntegerField()
+    recent_users = UserSerializer(read_only=True, many=True)
+    active_users = serializers.IntegerField()
+    pending_count = serializers.IntegerField()
+    
     def get_user(self, obj):
         user = obj['user']
         return {

@@ -214,7 +214,7 @@ def dashboard(request):
     material_count = Material.objects.all().count()
     task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
     recent_jobs = Job.objects.order_by('-created_at')[:5]
-    
+    recent_users = User.objects.order_by('-created_at')[:5]
     dashboard = {}
     dashboard['user'] = user
     dashboard['tasks'] = tasks
