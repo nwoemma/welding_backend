@@ -28,7 +28,8 @@ ALLOWED_HOSTS = [
     'welding-backend-vm1n.onrender.com',
 ]
 
-print(os.environ.get('SENDGRID_API_KEY'))
+# print(os.environ.get('SENDGRID_API_KEY'))
+
 
 # Application definition
 INSTALLED_APPS = [
