@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
-
+# from dotenv import load_dotenv
+# load_dotenv()
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -26,6 +27,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'welding-backend-vm1n.onrender.com',
 ]
+
+print(os.environ.get('SENDGRID_API_KEY'))
 
 # Application definition
 INSTALLED_APPS = [
