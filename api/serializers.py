@@ -90,7 +90,7 @@ class DashboardSerializer(serializers.Serializer):
     task_count = serializers.IntegerField()
     total_notifications = serializers.IntegerField()
     recent_users = UserSerializer(read_only=True, many=True)
-    active_users = serializers.IntegerField()
+    active_users = UserSerializer(read_only=True, many=True)
     pending_count = serializers.IntegerField()
     
     # def get_user(self, obj):
