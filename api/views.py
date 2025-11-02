@@ -193,6 +193,7 @@ def login_user(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logout_user(request):
+    print(f"User {request.user.email} has logged out.")
     Token.objects.filter(user=request.user).delete()
     logout(request)
     return Response({"message": "Logged out successfully."}, status=200)
