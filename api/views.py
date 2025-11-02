@@ -211,10 +211,10 @@ def dashboard(request):
     tasks = Task.objects.filter(job__client=user) if hasattr(user, 'role') and user.role == 'client' else Task.objects.all()
     unread_notification_count = notifications.filter(read=False).count()
     total_users = User.objects.all().count()
-    total_jobs = Job.objects.filter(welder=user).all()
-    pending_count = Job.objects.filter(status="Pending")
+    total_jobs = Job.objects.filter(welder=user).all().count()
+    pending_count = Job.objects.filter(status="Pending").count()
     job_count = Job.objects.filter(client=user).count()
-    material_count = Material.objects.all().count()
+    materials_count = Material.objects.all().count()
     total_notifications = Notification.objects.all().count()
     task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
     active_users = User.objects.filter(status="active")[:5]
@@ -226,7 +226,7 @@ def dashboard(request):
     dashboard['jobs'] = jobs
     dashboard['materials'] = materials
     dashboard['job_count'] = job_count
-    dashboard['material_count'] = material_count
+    dashboard['materials_count'] = materials_count
     dashboard['unread_notifications_count'] = unread_notification_count
     dashboard['notifications'] = notifications
     dashboard['unread_notification_count']= unread_notification_count

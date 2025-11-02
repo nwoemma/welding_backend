@@ -82,6 +82,7 @@ class DashboardSerializer(serializers.Serializer):
     materials = MaterialSerializer(read_only=True, many=True)
     recent_jobs = JobSerializer(read_only=True, many=True)
     tasks = TaskSerializer(read_only=True, many=True)
+    total_users = serializers.IntegerField()
     unread_notifications_count = serializers.IntegerField()
     total_jobs = serializers.IntegerField()
     materials_count = serializers.IntegerField()
