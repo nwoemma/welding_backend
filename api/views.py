@@ -219,7 +219,7 @@ def dashboard(request):
         total_notifications = Notification.objects.all().count()
         task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
         active_users = User.objects.filter(status="A")[:5]
-        recent_users = User.objects.order_by('-created_at')[:5]
+        recent_users = User.objects.order_by('-date_joined')[:5]
         recent_jobs = Job.objects.all()[:5]
         dashboard = {}
         dashboard['user'] = user
@@ -242,7 +242,7 @@ def dashboard(request):
         serializer = DashboardSerializer(dashboard, context= {'request':request})
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
-        logger.error(f"Dashboard view error: {str(e)}", exc_info=True)
+        print(f"Dashboard error: {str(e)}")
         return Response({"error": "Internal server error"}, status=500)
 @api_view(['GET', 'PUT'])
 @authentication_classes([TokenAuthentication])

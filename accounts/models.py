@@ -75,7 +75,6 @@ class User(AbstractUser):
     
     location = models.CharField(max_length=100, blank=True, null=True)
     
-    
     education = models.CharField(max_length=100, blank=True, null=True)
     skills = models.CharField(max_length=255, blank=True, null=True)
     job = models.CharField(max_length=100, blank=True, null=True)
