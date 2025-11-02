@@ -201,45 +201,49 @@ def logout_user(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def dashboard(request):
-    print("AUTH HEADER:", request.META.get("HTTP_AUTHORIZATION"))
-    print("User:", request.user)
-    print("Is authenticated:", request.user.is_authenticated)
-    user = request.user
-    jobs = Job.objects.filter(client=user) if user.role == 'client' else Job.objects.all()
-    materials = Material.objects.all()  # if 'client' is correct
-    notifications = Notification.objects.filter(user=user)
-    tasks = Task.objects.filter(job__client=user) if hasattr(user, 'role') and user.role == 'client' else Task.objects.all()
-    unread_notification_count = notifications.filter(read=False).count()
-    total_users = User.objects.all().count()
-    total_jobs = Job.objects.filter(welder=user).all().count()
-    pending_count = Job.objects.filter(status="Pending").count()
-    job_count = Job.objects.filter(client=user).count()
-    materials_count = Material.objects.all().count()
-    total_notifications = Notification.objects.all().count()
-    task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
-    active_users = User.objects.filter(status="A")[:5]
-    recent_users = User.objects.order_by('-created_at')[:5]
-    recent_jobs = Job.objects.all()[:5]
-    dashboard = {}
-    dashboard['user'] = user
-    dashboard['tasks'] = tasks
-    dashboard['jobs'] = jobs
-    dashboard['materials'] = materials
-    dashboard['job_count'] = job_count
-    dashboard['materials_count'] = materials_count
-    dashboard['unread_notifications_count'] = unread_notification_count
-    dashboard['notifications'] = notifications
-    dashboard['unread_notification_count']= unread_notification_count
-    dashboard['total_users'] = total_users
-    dashboard['total_jobs'] = total_jobs
-    dashboard['recent_jobs'] = recent_jobs
-    dashboard['pending_count'] = pending_count
-    dashboard['task_count'] = task_count
-    dashboard['active_users'] = active_users
-    dashboard['recent_users'] = recent_users
-    dashboard['total_notifications'] = total_notifications
-    serializer = DashboardSerializer(dashboard, context= {'request':request})
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    try:
+        print("AUTH HEADER:", request.META.get("HTTP_AUTHORIZATION"))
+        print("User:", request.user)
+        print("Is authenticated:", request.user.is_authenticated)
+        user = request.user
+        jobs = Job.objects.filter(client=user) if user.role == 'client' else Job.objects.all()
+        materials = Material.objects.all()  # if 'client' is correct
+        notifications = Notification.objects.filter(user=user)
+        tasks = Task.objects.filter(job__client=user) if hasattr(user, 'role') and user.role == 'client' else Task.objects.all()
+        unread_notification_count = notifications.filter(read=False).count()
+        total_users = User.objects.all().count()
+        total_jobs = Job.objects.filter(welder=user).all().count()
+        pending_count = Job.objects.filter(status="Pending").count()
+        job_count = Job.objects.filter(client=user).count()
+        materials_count = Material.objects.all().count()
+        total_notifications = Notification.objects.all().count()
+        task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
+        active_users = User.objects.filter(status="A")[:5]
+        recent_users = User.objects.order_by('-created_at')[:5]
+        recent_jobs = Job.objects.all()[:5]
+        dashboard = {}
+        dashboard['user'] = user
+        dashboard['tasks'] = tasks
+        dashboard['jobs'] = jobs
+        dashboard['materials'] = materials
+        dashboard['job_count'] = job_count
+        dashboard['materials_count'] = materials_count
+        dashboard['unread_notifications_count'] = unread_notification_count
+        dashboard['notifications'] = notifications
+        dashboard['unread_notification_count']= unread_notification_count
+        dashboard['total_users'] = total_users
+        dashboard['total_jobs'] = total_jobs
+        dashboard['recent_jobs'] = recent_jobs
+        dashboard['pending_count'] = pending_count
+        dashboard['task_count'] = task_count
+        dashboard['active_users'] = active_users
+        dashboard['recent_users'] = recent_users
+        dashboard['total_notifications'] = total_notifications
+        serializer = DashboardSerializer(dashboard, context= {'request':request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        logger.error(f"Dashboard view error: {str(e)}", exc_info=True)
+        return Response({"error": "Internal server error"}, status=500)
 @api_view(['GET', 'PUT'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
