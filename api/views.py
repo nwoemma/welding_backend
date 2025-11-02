@@ -209,12 +209,17 @@ def dashboard(request):
     materials = Material.objects.all()  # if 'client' is correct
     notifications = Notification.objects.filter(user=user)
     tasks = Task.objects.filter(job__client=user) if hasattr(user, 'role') and user.role == 'client' else Task.objects.all()
-    notification_count = notifications.filter(read=False).count()
+    unread_notification_count = notifications.filter(read=False).count()
+    total_users = User.objects.all().count()
+    total_jobs = Job.objects.filter(welder=user).all()
+    pending_count = Job.objects.filter(status="Pending")
     job_count = Job.objects.filter(client=user).count()
     material_count = Material.objects.all().count()
+    total_notifications = Notification.objects.all().count()
     task_count = Task.objects.filter(job__client=user).count()if hasattr(user, 'role') and user.role == 'client' else Task.objects.all().count()
-    recent_jobs = Job.objects.order_by('-created_at')[:5]
+    active_users = User.objects.filter(status="active")[:5]
     recent_users = User.objects.order_by('-created_at')[:5]
+    recent_jobs = Job.objects.all()[:5]
     dashboard = {}
     dashboard['user'] = user
     dashboard['tasks'] = tasks
@@ -222,20 +227,17 @@ def dashboard(request):
     dashboard['materials'] = materials
     dashboard['job_count'] = job_count
     dashboard['material_count'] = material_count
-    dashboard['notification_count'] = notification_count
-    dashboard['notifications'] = NotificationSerializer(notifications, many=True).data
-    dashboard['task_count'] = task_count
+    dashboard['unread_notifications_count'] = unread_notification_count
+    dashboard['notifications'] = notifications
+    dashboard['unread_notification_count']= unread_notification_count
+    dashboard['total_users'] = total_users
+    dashboard['total_jobs'] = total_jobs
     dashboard['recent_jobs'] = recent_jobs
-    if user.role == 'admin':
-        dashboard['total_users'] = User.objects.count()
-        dashboard['total_jobs'] = Job.objects.count()
-        dashboard['total_materials'] = Material.objects.count()
-        dashboard['total_notifications'] = Notification.objects.count()
-        dashboard['recent_jobs'] = Job.objects.order_by('-created_at')[:5]
-        dashboard['active_users'] = User.objects.filter(is_active=True).count()
-        dashboard['recent_users'] = User.objects.order_by('-date_joined')[:5]
-        dashboard['pending_approvals'] = User.objects.filter(is_active=False).count()
-
+    dashboard['pending_count'] = pending_count
+    dashboard['task_count'] = task_count
+    dashboard['active_users'] = active_users
+    dashboard['recent_users'] = recent_users
+    dashboard['total_notifications'] = total_notifications
     serializer = DashboardSerializer(dashboard, context= {'request':request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 @api_view(['GET', 'PUT'])
